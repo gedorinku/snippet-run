@@ -9,7 +9,6 @@ import io.github.gedorinku.snippetrun.runner.ExecuteCommand
 import io.github.gedorinku.snippetrun.runner.Runner
 import kotlinx.coroutines.experimental.async
 import java.io.File
-import java.net.URL
 import java.util.*
 
 /**
@@ -17,9 +16,13 @@ import java.util.*
  */
 class SlackBotService {
 
+    lateinit var slackClient: SlackApiClient
+
     fun start() {
-        val session = SlackSessionFactory.createWebSocketSlackSession(loadApiToken())
+        val apiToken = loadApiToken()
+        val session = SlackSessionFactory.createWebSocketSlackSession(apiToken)
         session.connect()
+        slackClient = SlackApiClient(apiToken)
         session.addMessagePostedListener { event, session ->
             if (event.messageSubType != SlackMessagePosted.MessageSubType.FILE_SHARE ||
                     !event.slackFile.mimetype.startsWith("text/")) {
@@ -31,11 +34,9 @@ class SlackBotService {
     }
 
     private fun tryRunSnippet(session: SlackSession, channel: SlackChannel, slackFile: SlackFile) = async {
-        val extention = getFileNameExtention(slackFile.name)
-        val executeCommand = ExecuteCommand.COMMANDS[extention] ?: return@async
-        val sourceCode = URL(slackFile.permalinkPublic).openStream().bufferedReader().use {
-            it.readText()
-        }
+        val extension = getFileNameExtension(slackFile.name)
+        val executeCommand = ExecuteCommand.COMMANDS[extension] ?: return@async
+        val sourceCode = slackClient.fetchTextFile(slackFile.urlPrivate)
 
         val result = try {
             Runner.run(executeCommand, sourceCode)
@@ -43,7 +44,8 @@ class SlackBotService {
             t.printStackTrace()
             throw t
         }
-        session.sendMessage(channel, result.output)
+        session.sendMessage(channel, "error output:\n${result.errorOutput}")
+        session.sendMessage(channel, "output:\n${result.output}")
     }
 
     private fun loadApiToken(): String =
@@ -52,7 +54,7 @@ class SlackBotService {
                 getProperty("slackApiToken", "")
             }
 
-    private fun getFileNameExtention(name: String): String {
+    private fun getFileNameExtension(name: String): String {
         val index = name.lastIndexOf('.')
         return if (index == -1) {
             ""
