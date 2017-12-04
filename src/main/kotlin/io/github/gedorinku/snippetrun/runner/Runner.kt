@@ -20,7 +20,7 @@ object Runner {
                 .executeByShell()
                 .waitOutputSync()
 
-        ProcessBuilder("docker rm $containerId")
+        ProcessBuilder("docker rm -f $containerId")
                 .executeByShell()
                 .waitFor()
 
