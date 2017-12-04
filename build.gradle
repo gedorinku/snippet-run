@@ -19,10 +19,13 @@ mainClassName = 'io.github.gedorinku.snippetrun.MainKt'
 
 repositories {
     mavenCentral()
+    maven { url "https://dl.bintray.com/kotlin/kotlinx" }
 }
 
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
+    compile "org.jetbrains.kotlinx:kotlinx-coroutines-core:0.19.3"
+    compile "com.ullink.slack:simpleslackapi:1.2.0"
 
     testCompile "junit:junit:4.12"
 }

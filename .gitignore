@@ -8,3 +8,5 @@
 /captures
 .externalNativeBuild
 /out
+
+secrets.properties
