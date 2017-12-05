@@ -12,10 +12,11 @@ data class ProcessOutput(val output: String, val errorOutput: String)
 /**
  * プロセスが終了するまで待って標準出力を返します。
  * @param outputLimit 標準出力をoutputLimit bytesで打ち切ります。(デフォルトは256)
+ * @param timeout timeout(秒)でプロセスをkillします。(デフォルトは10秒)
  */
-fun Process.waitOutputSync(outputLimit: Int = 256): ProcessOutput {
+fun Process.waitOutputSync(outputLimit: Int = 256, timeout: Long = 10L): ProcessOutput {
     return try {
-        waitFor(10, TimeUnit.SECONDS)
+        waitFor(timeout, TimeUnit.SECONDS)
 
         val output = readString(inputStream, outputLimit)
         val errorOutput = readString(errorStream, outputLimit)

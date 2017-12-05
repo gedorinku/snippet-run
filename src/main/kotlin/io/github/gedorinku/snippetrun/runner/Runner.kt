@@ -18,7 +18,7 @@ object Runner {
 
         val output = ProcessBuilder("docker start -i $containerId")
                 .executeByShell()
-                .waitOutputSync()
+                .waitOutputSync(timeout = 5)
 
         ProcessBuilder("docker rm -f $containerId")
                 .executeByShell()
