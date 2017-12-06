@@ -26,12 +26,11 @@ fun Process.waitOutputSync(outputLimit: Int = 256, timeout: Long = 10L): Process
     }
 }
 
-private fun readString(inputStream: InputStream, limit: Int): String = inputStream.use {
+private fun readString(inputStream: InputStream, limit: Int): String = inputStream.reader().use {
     val bytes = mutableListOf<Byte>()
-    var next = it.read()
-    while (bytes.size < limit && next != -1) {
+    while (bytes.size < limit && it.ready()) {
+        val next = it.read()
         bytes.add(next.toByte())
-        next = it.read()
     }
 
     String(bytes.toByteArray())

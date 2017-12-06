@@ -8,6 +8,7 @@ import java.io.File
 object Runner {
 
     private val workspaceDir = "/tmp/snippet-run"
+    private const val timeoutSeconds = 3L
 
     fun run(executeCommand: ExecuteCommand, sourceCode: String): ProcessOutput {
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true")
@@ -16,22 +17,20 @@ object Runner {
 
         copySourceCodeToContainer(executeCommand, sourceCode, containerId)
 
-        val output = ProcessBuilder("docker start -i $containerId")
-                .executeByShell()
-                .waitOutputSync(timeout = 5)
-
-        ProcessBuilder("docker rm -f $containerId")
-                .executeByShell()
-                .waitFor()
-
-        return output
+        return try {
+            ProcessBuilder("docker start -i $containerId")
+                    .executeByShell()
+                    .waitOutputSync(timeout = timeoutSeconds + 1L)
+        } finally {
+            removeContainer(containerId)
+        }
     }
 
     private fun createContainer(command: String): String {
         val dockerCommand =
                 "docker create -i --net none --cpuset-cpus 0 --memory 256m --memory-swap 512m " +
                         "--pids-limit 10 --ulimit fsize=1000000 -w /tmp/workspace snippet-run-image " +
-                        "timeout 3 su container -s /bin/sh -c '$command'"
+                        "timeout $timeoutSeconds su container -s /bin/sh -c '$command'"
         println(dockerCommand)
 
         //return container id
@@ -49,6 +48,12 @@ object Runner {
                 .writeText(sourceCode)
 
         ProcessBuilder("docker cp $tempSourceFilePath $containerId:/tmp/workspace")
+                .executeByShell()
+                .waitFor()
+    }
+
+    private fun removeContainer(containerId: String) {
+        ProcessBuilder("docker rm -f $containerId")
                 .executeByShell()
                 .waitFor()
     }
