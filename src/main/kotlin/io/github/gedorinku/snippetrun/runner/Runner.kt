@@ -30,7 +30,7 @@ object Runner {
     private fun createContainer(command: String): String {
         val dockerCommand =
                 "docker create -i --net none --cpuset-cpus 0 --memory 256m --memory-swap 512m " +
-                        "--ulimit nproc=75 --ulimit fsize=1000000 -w /tmp/workspace snippet-run-image " +
+                        "--pids-limit 10 --ulimit fsize=1000000 -w /tmp/workspace snippet-run-image " +
                         "timeout 3 su container -s /bin/sh -c '$command'"
         println(dockerCommand)
 
