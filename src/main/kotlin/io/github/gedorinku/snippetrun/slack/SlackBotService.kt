@@ -1,11 +1,10 @@
 package io.github.gedorinku.snippetrun.slack
 
-import com.ullink.slack.simpleslackapi.SlackChannel
-import com.ullink.slack.simpleslackapi.SlackFile
-import com.ullink.slack.simpleslackapi.SlackSession
+import com.ullink.slack.simpleslackapi.*
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
 import io.github.gedorinku.snippetrun.runner.ExecuteCommand
+import io.github.gedorinku.snippetrun.runner.ProcessOutput
 import io.github.gedorinku.snippetrun.runner.Runner
 import kotlinx.coroutines.experimental.async
 import java.io.File
@@ -44,8 +43,22 @@ class SlackBotService {
             t.printStackTrace()
             throw t
         }
-        session.sendMessage(channel, "error output:\n${result.errorOutput}")
-        session.sendMessage(channel, "output:\n${result.output}")
+
+        postResult(session, channel, result)
+    }
+
+    private fun postResult(session: SlackSession, channel: SlackChannel, result: ProcessOutput) {
+        val message = SlackPreparedMessage.Builder()
+                .addAttachment(SlackAttachment().apply {
+                    text = result.output
+                    color = "good"
+                })
+                .addAttachment(SlackAttachment().apply {
+                    text = result.errorOutput
+                    color = "danger"
+                })
+                .build()
+        session.sendMessage(channel, message)
     }
 
     private fun loadApiToken(): String =
