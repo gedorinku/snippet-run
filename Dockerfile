@@ -13,3 +13,6 @@ RUN apt install -y g++
 
 # Python3
 RUN apt install -y python3
+
+# Java
+RUN apt install -y openjdk-8-jdk

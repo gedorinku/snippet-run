@@ -16,5 +16,11 @@
     "filename":"Main.py",
     "executeCommand":"python3 -B Main.py",
     "versionCommand":"python3 --version"
+  },
+  {
+    "name":"Java",
+    "filename":"Main.java",
+    "executeCommand":"javac Main.java && java -Xss64m Main",
+    "versionCommand":"java -version"
   }
 ]
