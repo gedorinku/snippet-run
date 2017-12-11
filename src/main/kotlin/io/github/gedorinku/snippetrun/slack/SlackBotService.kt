@@ -37,14 +37,9 @@ class SlackBotService {
         val executeCommand = ExecuteCommand.COMMANDS[extension] ?: return@async
         val sourceCode = slackClient.fetchTextFile(slackFile.urlPrivate)
 
-        val result = try {
-            Runner.run(executeCommand, sourceCode)
-        } catch (t: Throwable) {
-            t.printStackTrace()
-            throw t
+        Runner.enqueue(executeCommand, sourceCode) {
+            postResult(session, channel, it)
         }
-
-        postResult(session, channel, result)
     }
 
     private fun postResult(session: SlackSession, channel: SlackChannel, result: ProcessOutput) {

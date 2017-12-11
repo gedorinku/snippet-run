@@ -1,5 +1,7 @@
 package io.github.gedorinku.snippetrun.runner
 
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.PublishSubject
 import java.io.File
 
 /**
@@ -9,8 +11,18 @@ object Runner {
 
     private val workspaceDir = "/tmp/snippet-run"
     private const val timeoutSeconds = 3L
+    private val queue = PublishSubject.create<Snippet>().apply {
+        subscribeOn(Schedulers.io()).subscribe(Runner::run)
+    }
 
-    fun run(executeCommand: ExecuteCommand, sourceCode: String): ProcessOutput {
+    fun enqueue(executeCommand: ExecuteCommand,
+                sourceCode: String,
+                onComplete: (ProcessOutput) -> Unit) {
+        queue.onNext(Snippet(executeCommand, sourceCode, onComplete))
+    }
+
+    private fun run(snippet: Snippet) {
+        val (executeCommand, sourceCode) = snippet
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true")
         createWorkspaceDirectory()
 
@@ -19,13 +31,15 @@ object Runner {
 
         copySourceCodeToContainer(executeCommand, sourceCode, containerId)
 
-        return try {
+        val result = try {
             ProcessBuilder("docker start -i $containerId")
                     .executeByShell()
                     .waitOutputSync(timeout = timeoutSeconds + 1L)
         } finally {
             removeContainer(containerId)
         }
+
+        snippet.onComplete(result)
     }
 
     private fun createWorkspaceDirectory() {
@@ -65,4 +79,8 @@ object Runner {
                 .executeByShell()
                 .waitFor()
     }
+
+    private data class Snippet(val executeCommand: ExecuteCommand,
+                               val sourceCode: String,
+                               val onComplete: (ProcessOutput) -> Unit)
 }
