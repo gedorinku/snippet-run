@@ -12,6 +12,8 @@ object Runner {
 
     fun run(executeCommand: ExecuteCommand, sourceCode: String): ProcessOutput {
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true")
+        createWorkspaceDirectory()
+
         val containerId = createContainer(executeCommand.command)
         println("ContainerId: $containerId")
 
@@ -24,6 +26,12 @@ object Runner {
         } finally {
             removeContainer(containerId)
         }
+    }
+
+    private fun createWorkspaceDirectory() {
+        ProcessBuilder("mkdir $workspaceDir")
+                .executeByShell()
+                .waitFor()
     }
 
     private fun createContainer(command: String): String {
