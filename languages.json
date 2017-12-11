@@ -10,5 +10,11 @@
     "filename":"main.cpp",
     "executeCommand":"g++ -std=gnu++1z -O2 -o main.o main.cpp && ./main.o",
     "versionCommand":"gcc --version"
+  },
+  {
+    "name":"Python3",
+    "filename":"Main.py",
+    "executeCommand":"python3 -B Main.py",
+    "versionCommand":"python3 --version"
   }
 ]

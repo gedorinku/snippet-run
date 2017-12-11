@@ -7,5 +7,9 @@ RUN useradd container
 RUN mkdir /tmp/workspace
 RUN chmod 777 /tmp/workspace
 
+
 # C/C++
 RUN apt install -y g++
+
+# Python3
+RUN apt install -y python3
