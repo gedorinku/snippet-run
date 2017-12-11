@@ -20,7 +20,13 @@
   {
     "name":"Java",
     "filename":"Main.java",
-    "executeCommand":"javac Main.java && java -Xss64m Main",
+    "executeCommand":"javac Main.java && java Main",
     "versionCommand":"java -version"
+  },
+  {
+    "name":"Kotlin",
+    "filename":"Main.kt",
+    "executeCommand":"/opt/kotlinc/bin/kotlinc Main.kt -include-runtime -d Main.jar && /opt/kotlinc/bin/kotlin -classpath Main.jar MainKt",
+    "versionCommand":"kotlin -version"
   }
 ]
