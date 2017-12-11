@@ -10,7 +10,7 @@ data class ExecuteCommand(val languageTag: String, val fileName: String, val com
 
     companion object {
 
-        val COMMANDS: Map<String, ExecuteCommand> by lazy { loadCommands() }
+        val COMMANDS: Map<String, ExecuteCommand> = loadCommands()
 
         private fun loadCommands(): Map<String, ExecuteCommand> {
             val commands = mutableMapOf<String, ExecuteCommand>()
