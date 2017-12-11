@@ -28,6 +28,7 @@ dependencies {
     compile "com.ullink.slack:simpleslackapi:1.2.0"
     compile 'com.squareup.retrofit2:retrofit:2.3.0'
     compile 'io.reactivex.rxjava2:rxjava:2.1.7'
+    compile 'com.google.code.gson:gson:2.8.2'
 
     testCompile "junit:junit:4.12"
 }

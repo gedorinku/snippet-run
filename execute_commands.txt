@@ -1,5 +1,0 @@
-#[language tag] [filename] [execute command]
-
-c main.c gcc -O2 -o main.o main.c && ./main.o
-
-cpp main.cpp g++ -O2 -o main.o main.cpp && ./main.o

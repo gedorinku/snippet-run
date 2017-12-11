@@ -3,7 +3,7 @@ package io.github.gedorinku.snippetrun.slack
 import com.ullink.slack.simpleslackapi.*
 import com.ullink.slack.simpleslackapi.events.SlackMessagePosted
 import com.ullink.slack.simpleslackapi.impl.SlackSessionFactory
-import io.github.gedorinku.snippetrun.runner.ExecuteCommand
+import io.github.gedorinku.snippetrun.runner.LanguageRegistry
 import io.github.gedorinku.snippetrun.runner.ProcessOutput
 import io.github.gedorinku.snippetrun.runner.Runner
 import kotlinx.coroutines.experimental.async
@@ -34,10 +34,10 @@ class SlackBotService {
 
     private fun tryRunSnippet(session: SlackSession, channel: SlackChannel, slackFile: SlackFile) = async {
         val extension = getFileNameExtension(slackFile.name)
-        val executeCommand = ExecuteCommand.COMMANDS[extension] ?: return@async
+        val language = LanguageRegistry.findLanguage(extension) ?: return@async
         val sourceCode = slackClient.fetchTextFile(slackFile.urlPrivate)
 
-        Runner.enqueue(executeCommand, sourceCode) {
+        Runner.enqueue(language, sourceCode) {
             postResult(session, channel, it)
         }
     }

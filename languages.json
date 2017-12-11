@@ -1,0 +1,14 @@
+[
+  {
+    "name":"C",
+    "filename":"main.c",
+    "executeCommand":"gcc -std=gnu11 -O2 -o main.o main.c && ./main.o",
+    "versionCommand":"gcc --version"
+  },
+  {
+    "name":"C++",
+    "filename":"main.cpp",
+    "executeCommand":"g++ -std=gnu++1z -O2 -o main.o main.cpp && ./main.o",
+    "versionCommand":"gcc --version"
+  }
+]

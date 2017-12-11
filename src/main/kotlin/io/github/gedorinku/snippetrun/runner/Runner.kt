@@ -15,21 +15,21 @@ object Runner {
         subscribeOn(Schedulers.io()).subscribe(Runner::run)
     }
 
-    fun enqueue(executeCommand: ExecuteCommand,
+    fun enqueue(language: Language,
                 sourceCode: String,
                 onComplete: (ProcessOutput) -> Unit) {
-        queue.onNext(Snippet(executeCommand, sourceCode, onComplete))
+        queue.onNext(Snippet(language, sourceCode, onComplete))
     }
 
     private fun run(snippet: Snippet) {
-        val (executeCommand, sourceCode) = snippet
+        val (language, sourceCode) = snippet
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true")
         createWorkspaceDirectory()
 
-        val containerId = createContainer(executeCommand.command)
+        val containerId = createContainer(language.executeCommand)
         println("ContainerId: $containerId")
 
-        copySourceCodeToContainer(executeCommand, sourceCode, containerId)
+        copySourceCodeToContainer(language, sourceCode, containerId)
 
         val result = try {
             ProcessBuilder("docker start -i $containerId")
@@ -48,11 +48,11 @@ object Runner {
                 .waitFor()
     }
 
-    private fun createContainer(command: String): String {
+    private fun createContainer(executeCommand: String): String {
         val dockerCommand =
                 "docker create -i --net none --cpuset-cpus 0 --memory 256m --memory-swap 512m " +
                         "--pids-limit 10 --ulimit fsize=1000000 -w /tmp/workspace snippet-run-image " +
-                        "timeout $timeoutSeconds su container -s /bin/sh -c '$command'"
+                        "timeout $timeoutSeconds su container -s /bin/sh -c '$executeCommand'"
         println(dockerCommand)
 
         //return container id
@@ -63,8 +63,8 @@ object Runner {
                 .substring(0, 12)
     }
 
-    private fun copySourceCodeToContainer(executeCommand: ExecuteCommand, sourceCode: String, containerId: String) {
-        val tempSourceFilePath = "$workspaceDir/${executeCommand.fileName}"
+    private fun copySourceCodeToContainer(language: Language, sourceCode: String, containerId: String) {
+        val tempSourceFilePath = "$workspaceDir/${language.filename}"
 
         File(tempSourceFilePath)
                 .writeText(sourceCode)
@@ -80,7 +80,8 @@ object Runner {
                 .waitFor()
     }
 
-    private data class Snippet(val executeCommand: ExecuteCommand,
+
+    private data class Snippet(val language: Language,
                                val sourceCode: String,
                                val onComplete: (ProcessOutput) -> Unit)
 }
