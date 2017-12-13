@@ -24,4 +24,8 @@ data class Language(val name: String = "",
     val dependsOn: Language? by lazy {
         LanguageRegistry.languages.find { it.name == dependsOnRaw }
     }
+
+    val dockerImageName by lazy {
+        DockerImageBuilder.dockerImageNameHeader + dockerDirectory
+    }
 }

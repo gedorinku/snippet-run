@@ -5,25 +5,31 @@ package io.github.gedorinku.snippetrun.runner
  */
 class DockerImageBuilder {
 
+    companion object {
+
+        const val dockerImageNameHeader = "snippet-run-image-"
+    }
+
     private val containersDirectory = "./containers"
 
     fun build() {
         val sorted = TopologicalSorting(LanguageRegistry.languages).sort()
 
         val imageCount = sorted.size + 1
-        val message = "Building docker images(%d/%d):./containers/%s"
+        val message = "Building docker images(%d/$imageCount):./containers/%s"
 
-        println(message.format(1, imageCount, "base"))
-        buildImage("base")
+        println(message.format(1, "base"))
+        buildImage("base", "${dockerImageNameHeader}base")
 
         sorted.forEachIndexed { index, language ->
-            println(message.format(index + 2, imageCount, language.dockerDirectory))
-            buildImage(language.dockerDirectory)
+            println(message.format(index + 2, language.dockerDirectory))
+            buildImage(language.dockerDirectory, language.dockerImageName)
         }
+
+        println("$imageCount images was successfully built.")
     }
 
-    private fun buildImage(directory: String) {
-        val imageName = "snippet-run-image-$directory"
+    private fun buildImage(directory: String, imageName: String) {
         val command = "docker build -t $imageName $containersDirectory/$directory"
         val exitCode = ProcessBuilder(command)
                 .executeByShell()
