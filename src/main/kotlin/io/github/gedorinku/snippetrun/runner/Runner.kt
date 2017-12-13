@@ -26,7 +26,7 @@ object Runner {
         System.setProperty("jdk.lang.Process.allowAmbiguousCommands", "true")
         createWorkspaceDirectory()
 
-        val containerId = createContainer(language.executeCommand)
+        val containerId = createContainer(language)
         println("ContainerId: $containerId")
 
         copySourceCodeToContainer(language, sourceCode, containerId)
@@ -48,11 +48,11 @@ object Runner {
                 .waitFor()
     }
 
-    private fun createContainer(executeCommand: String): String {
+    private fun createContainer(language: Language): String {
         val dockerCommand =
                 "docker create -i --net none --cpuset-cpus 0 --memory 256m --memory-swap 512m " +
-                        "--pids-limit 20 --ulimit fsize=1000000 -w /tmp/workspace snippet-run-image " +
-                        "timeout $timeoutSeconds su container -s /bin/sh -c '$executeCommand'"
+                        "--pids-limit 20 --ulimit fsize=1000000 -w /tmp/workspace ${language.dockerImageName} " +
+                        "timeout $timeoutSeconds su container -s /bin/sh -c '${language.executeCommand}'"
         println(dockerCommand)
 
         //return container id
