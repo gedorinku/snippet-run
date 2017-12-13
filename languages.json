@@ -2,30 +2,36 @@
   {
     "name":"C",
     "filename":"main.c",
+    "dockerDirectory":"cpp",
     "executeCommand":"gcc -std=gnu11 -O2 -o main.o main.c && ./main.o",
     "versionCommand":"gcc --version"
   },
   {
     "name":"C++",
     "filename":"main.cpp",
+    "dockerDirectory":"cpp",
     "executeCommand":"g++ -std=gnu++1z -O2 -o main.o main.cpp && ./main.o",
     "versionCommand":"gcc --version"
   },
   {
     "name":"Python3",
     "filename":"Main.py",
+    "dockerDirectory":"python",
     "executeCommand":"python3 -B Main.py",
     "versionCommand":"python3 --version"
   },
   {
     "name":"Java",
     "filename":"Main.java",
+    "dockerDirectory":"java",
     "executeCommand":"javac Main.java && java Main",
     "versionCommand":"java -version"
   },
   {
     "name":"Kotlin",
     "filename":"Main.kt",
+    "dockerDirectory":"kotlin",
+    "dependsOn":"Java",
     "executeCommand":"/opt/kotlinc/bin/kotlinc Main.kt -include-runtime -d Main.jar && /opt/kotlinc/bin/kotlin -classpath Main.jar MainKt",
     "versionCommand":"kotlin -version"
   }
